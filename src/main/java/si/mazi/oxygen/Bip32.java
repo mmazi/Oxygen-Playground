@@ -27,8 +27,7 @@ public class Bip32 {
 
         writeSeedDerived("User deposits", m, 0);
 
-        writeAccountAddress("Hot wallet - user deposits forward address", m, 1, 0);
-        writeAccountAddress("Hot wallet - refills from cold wallet", m, 1, 1);
+        writeAccountAddress("Hot wallet", m, 1, 0);
         writeAccountAddress("Cold wallet", m, 2, 0);
     }
 

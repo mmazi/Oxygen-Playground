@@ -6,6 +6,8 @@ import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicHierarchy;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
+import org.bitcoinj.crypto.MnemonicCode;
+import org.bitcoinj.crypto.MnemonicException;
 import org.bitcoinj.params.MainNetParams;
 import org.ethereum.crypto.ECKey;
 import org.slf4j.Logger;
@@ -20,15 +22,27 @@ public class Bip32 {
 
     private static final MainNetParams MAINNET = MainNetParams.get();
 
-    public static void main(String[] args) {
-        DeterministicKey m = HDKeyDerivation.createMasterPrivateKey(Hex.decode("e16e395b7b6c8914903a216d09e470440ee685338a6ae784dd4890c7a184ee57"));
+    public static void main(String[] args) throws Exception {
+        byte[] masterSeed = Hex.decode("e16e395b7b6c8914903a216d09e470440ee685338a6ae784dd4890c7a184ee57");
+        DeterministicKey m = HDKeyDerivation.createMasterPrivateKey(masterSeed);
 
         writeSeed("Master", m);
+        writeMasterMnemonic(masterSeed);
 
         writeSeedDerived("User deposits", m, 0);
+        writeSeed("User deposits external chain", deriveAccountExternal(m, 0));
 
         writeAccountAddress("Hot wallet", m, 1, 0);
         writeAccountAddress("Cold wallet", m, 2, 0);
+
+        //writeAccountAddress("User 123456789 deposits", m, 0, 123456789);
+        //writeAccountAddress("User 123456781 deposits", m, 0, 123456781);
+        //writeAccountAddress("User 123454321 deposits", m, 0, 123454321);
+    }
+
+    private static void writeMasterMnemonic(byte[] masterSeed) throws MnemonicException.MnemonicLengthException {
+        List<String> words = MnemonicCode.INSTANCE.toMnemonic(masterSeed);
+        log.info("{}", Joiner.on(' ').join(words));
     }
 
     private static void writeSeed(String keyDesc, DeterministicKey key) {
@@ -38,7 +52,7 @@ public class Bip32 {
     }
 
     private static void writeSeedDerived(String keyDesc, DeterministicKey m, int account) {
-        writeSeed(keyDesc, deriveAccountExt(m, account));
+        writeSeed(keyDesc, deriveAccount(m, account));
     }
 
     private static void writeAccountAddress(String keyDesc, DeterministicKey m, int account, int subIdx) {
@@ -56,7 +70,14 @@ public class Bip32 {
         return derive(m, path);
     }
 
-    private static DeterministicKey deriveAccountExt(DeterministicKey m, int account) {
+    private static DeterministicKey deriveAccount(DeterministicKey m, int account) {
+        //  m/44'/60'/account'
+        List<ChildNumber> path =
+                ImmutableList.of(new ChildNumber(44, true), new ChildNumber(60, true), new ChildNumber(account, true));
+        return derive(m, path);
+    }
+
+    private static DeterministicKey deriveAccountExternal(DeterministicKey m, int account) {
         //  m/44'/60'/account'/0
         List<ChildNumber> path =
                 ImmutableList.of(new ChildNumber(44, true), new ChildNumber(60, true), new ChildNumber(account, true), new ChildNumber(0, false));

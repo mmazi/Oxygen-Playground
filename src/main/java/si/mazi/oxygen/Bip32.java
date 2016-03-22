@@ -30,6 +30,8 @@ public class Bip32 {
         writeMasterMnemonic(masterSeed);
 
         writeSeedDerived("User deposits", m, 0);
+        writeSeedDerived("Hot Wallet", m, 1);
+        writeSeedDerived("Cold Wallet", m, 2);
         writeSeed("User deposits external chain", deriveAccountExternal(m, 0));
 
         writeAccountAddress("Hot wallet", m, 1, 0);
@@ -58,7 +60,7 @@ public class Bip32 {
     private static void writeAccountAddress(String keyDesc, DeterministicKey m, int account, int subIdx) {
         DeterministicKey key = deriveAccountExtSub(m, account, subIdx);
         log.info(keyDesc + ":");
-        log.info("        key: " + key.getPrivateKeyAsHex());
+        //log.info("        key: " + key.getPrivateKeyAsHex());
         log.info("    address: " + getEthereumAddress(key));
     }
 

@@ -23,8 +23,12 @@ public class Bip32 {
     private static final MainNetParams MAINNET = MainNetParams.get();
 
     public static void main(String[] args) throws Exception {
-        byte[] masterEntropy = Hex.decode("f093b7a62763677a9b26ad7bbdd8b667583f66188e5fe41fa85525b795114b54");
+        byte[] masterEntropy = Hex.decode("ed1fca83d319615dd0eed49576db10d21f05a7ea6d461516f5804dc2c1316372");
         byte[] masterSeed = writeMasterMnemonicAndReturnSeed(masterEntropy);
+        for (byte b : masterSeed) {
+            System.out.print(String.format("%02X", b));
+        }
+        System.out.println();
 
         DeterministicKey m = HDKeyDerivation.createMasterPrivateKey(masterSeed);
 
@@ -46,7 +50,7 @@ public class Bip32 {
     private static byte[] writeMasterMnemonicAndReturnSeed(byte[] entropy) throws MnemonicException.MnemonicLengthException {
         List<String> words = MnemonicCode.INSTANCE.toMnemonic(entropy);
         log.info("{}", Joiner.on(' ').join(words));
-        return MnemonicCode.toSeed(words, null);
+        return MnemonicCode.toSeed(words, "");
     }
 
     private static void writeSeed(String keyDesc, DeterministicKey key) {

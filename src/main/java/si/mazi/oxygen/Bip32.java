@@ -23,11 +23,12 @@ public class Bip32 {
     private static final MainNetParams MAINNET = MainNetParams.get();
 
     public static void main(String[] args) throws Exception {
-        byte[] masterSeed = Hex.decode("e16e395b7b6c8914903a216d09e470440ee685338a6ae784dd4890c7a184ee57");
+        byte[] masterEntropy = Hex.decode("f093b7a62763677a9b26ad7bbdd8b667583f66188e5fe41fa85525b795114b54");
+        byte[] masterSeed = writeMasterMnemonicAndReturnSeed(masterEntropy);
+
         DeterministicKey m = HDKeyDerivation.createMasterPrivateKey(masterSeed);
 
         writeSeed("Master", m);
-        writeMasterMnemonic(masterSeed);
 
         writeSeedDerived("User deposits", m, 0);
         writeSeedDerived("Hot Wallet", m, 1);
@@ -42,9 +43,10 @@ public class Bip32 {
         //writeAccountAddress("User 123454321 deposits", m, 0, 123454321);
     }
 
-    private static void writeMasterMnemonic(byte[] masterSeed) throws MnemonicException.MnemonicLengthException {
-        List<String> words = MnemonicCode.INSTANCE.toMnemonic(masterSeed);
+    private static byte[] writeMasterMnemonicAndReturnSeed(byte[] entropy) throws MnemonicException.MnemonicLengthException {
+        List<String> words = MnemonicCode.INSTANCE.toMnemonic(entropy);
         log.info("{}", Joiner.on(' ').join(words));
+        return MnemonicCode.toSeed(words, null);
     }
 
     private static void writeSeed(String keyDesc, DeterministicKey key) {

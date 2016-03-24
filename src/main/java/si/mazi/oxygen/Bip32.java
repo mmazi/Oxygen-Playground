@@ -30,9 +30,9 @@ public class Bip32 {
 
         writeSeed("Master", m);
 
-        writeSeedDerived("User deposits", m, 0);
-        writeSeedDerived("Hot Wallet", m, 1);
-        writeSeedDerived("Cold Wallet", m, 2);
+        writeSeedDerived("userDeposits", m, 0);
+        writeSeedDerived("hotWallet", m, 1);
+        writeSeedDerived("coldWallet", m, 2);
         writeSeed("User deposits external chain", deriveAccountExternal(m, 0));
 
         writeAccountAddress("Hot wallet", m, 1, 0);
@@ -51,8 +51,8 @@ public class Bip32 {
 
     private static void writeSeed(String keyDesc, DeterministicKey key) {
         log.info(keyDesc + ":");
-        log.info("    private: " + key.serializePrivB58(MAINNET));
-        log.info("     public: " + key.serializePubB58(MAINNET));
+        log.info("    xprv: " + key.serializePrivB58(MAINNET));
+        log.info("    xpub: " + key.serializePubB58(MAINNET));
     }
 
     private static void writeSeedDerived(String keyDesc, DeterministicKey m, int account) {
